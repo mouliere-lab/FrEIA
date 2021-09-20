@@ -1,0 +1,35 @@
+# Credits to Joakim Elofsson, Stack Exchange
+
+# Ignore everything
+*
+
+# But not these files...
+!.gitignore
+!*.smk
+!*.py
+!*.md
+!*.sh
+!*.R
+!*.Rmd
+!*.sbatch
+!*.yaml
+!*.yml
+!*.csv
+!*.fa
+!*.txt
+!*.sizes
+!*.bedGraph
+
+# ...even if they are in subdirectories
+!*/
+
+# ...but not in .snakemake/, conda/ or ... directories
+*.snakemake/
+*conda/
+
+# Ignore all new samplesheets
+*samplesheet*
+
+# # if the files to be tracked are in subdirectories
+# !*/a/b/file1.txt
+# !*/a/b/c/*

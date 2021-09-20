@@ -1,0 +1,50 @@
+# ===GENERAL PARAMETERS===
+# Environment deffinition.
+EnvironmentDef: ../../envs/core_pipeline_conda_env_3.yaml
+# The name of the project will be used to separate the runs.
+ProjName: Default_project
+# Path to the directory containing the sample fastqs.
+SamplePath:
+# Path to the sample sheet.
+Samplesheet: ../../../config/samplesheet.csv
+# Indexed reference path.
+RefPath:
+# Output path.
+OutPath:
+# Path to TMPDIR.
+TmpDir:
+# Number of threads to use.
+ThreadNr: 24
+# Choose which trimmer to use. Can be [bbduk, cutadapt, none].
+#Chosing none will turn trimming off.
+Trimmer: bbduk
+
+# ===TRIMMING PARAMETERS===
+BbdukFlags: "ktrim=r k=23 mink=11 hdist=1"
+#Path to the adapters used for trimming with Bbduk.
+Adapters: ../../../resources/Bbduk/adapters.fa
+
+
+#===FILTERING PARAMETERS===
+# Read filtering - quality
+FiltQual: 5
+
+#===FREIA | EXTRACT_FRAGMENT_ENDS PARAMETERS===
+# The number of bases to be extracted on the fragment ends.
+nBase: 10
+
+#===FREIA | DATA_TRANSFORMATION PARAMETERS===
+# The fraction (between 0 and 1) of reads to use. The default is 1.
+SubSampleRate: 1
+# The size (in bases) of the minimum fragment size to analyze. The default is 1.
+FragmSizeMin: 1
+# The size (in bases) of the maximum fragment size to analyze. The default is 500.
+FragmSizeMax: 500
+# The number of bootstrapped samples to produce.
+# This results in samples where the same read can be present multiple times!
+BsSampNr: 0
+
+#===FREIA | COMPARE_GROUPS PARAMETERS===
+SubsetResults: 10
+# The path to the regrouping sheet. If empty will use the original samplesheet.
+Regroup:
