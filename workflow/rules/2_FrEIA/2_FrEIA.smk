@@ -11,23 +11,8 @@ AffectedGroups = ",".join(np.setdiff1d(Samplesheet["group"].unique(),
 ControlGroup = ControlGroup[0][:-1]
 SampleGroups = Samplesheet["group"].str.replace(r'\W', '')
 
-Levels = ["Genome_Lvl",
-          "Chromosome_Lvl",
-          "SubChr_Lvl"]
-Prefixes = ["M", "T", "P", "JM", "JT"]
-
-
-# Collecting the outut paths for the multioutput rule FrEIA_CalcAb.
-def CalcAbOut(group, sample):
-    outPathL = list()
-    for lvl in Levels:
-        for pref in Prefixes:
-            outPath = "".join((config["OutPath"], "/", ProjDirName,
-                               "/FrEIA/3_Abundances/", group, "/",
-                               lvl, "/", pref, "__", sample, ".pq"))
-            outPathL.append(outPath)
-    return outPathL
-
+Levels = ["Genome_Lvl"]
+Prefixes = ["M", "T"]
 
 if config["Trimmer"] in ["bbduk", "cutadapt"]:
     ProjDirName = config["ProjName"] + "/trimmed"
@@ -37,27 +22,48 @@ elif config["Trimmer"] == "none":
     ProjDirName = config["ProjName"] + "/untrimmed"
     tmp_dir = config["TmpDir"] + "/" + ProjDirName  # Set TEMPDIR.
 
-localrules: compare_groups
 
+rule FrEIA_all:
+    input:
+        config["OutPath"] + "/" + ProjDirName +
+        "/4_FrEIA/4_Compare/Data/Dat_GM__sample.csv",
+        config["OutPath"] + "/" + ProjDirName +
+        "/4_FrEIA/4_Compare/Data/Dat_GT__MDS_sample.csv",
+        config["OutPath"] + "/" + ProjDirName +
+        "/4_FrEIA/4_Compare/Data/Dat_GT__sample.csv",
+        config["OutPath"] + "/" + ProjDirName +
+        "/4_FrEIA/5_FrEIA_score/" + config["ProjName"] + "_corrected_tnc.csv",
+        config["OutPath"] + "/" + ProjDirName +
+        "/4_FrEIA/5_FrEIA_score/" + config["ProjName"] + "_FrEIA_score.csv"
+# Calculating fragment end sequence diversity and creating outputs,
+# containing all the samples.
 rule compare_groups:
     input:
         expand(config["OutPath"] + "/" + ProjDirName +
-               "/FrEIA/3_Abundances/{group}/{lvl}/{prefix}__{sample}.pq",
+               "/4_FrEIA/3_Abundances/{group}/{lvl}/{prefix}__{sample}.pq",
                zip,
                group=np.repeat(SampleGroups, (len(Prefixes) * len(Levels))),
                lvl=np.repeat(Levels, len(Prefixes)).tolist() * len(SampleGroups),
                prefix=Prefixes * len(Levels) * len(SampleGroups),
                sample=np.repeat(Samplesheet["sample_name"],
                                 (len(Prefixes) * len(Levels))).tolist() * len(SampleGroups))
+    output:
+        config["OutPath"] + "/" + ProjDirName +
+        "/4_FrEIA/4_Compare/Data/Dat_GM__sample.csv",
+        config["OutPath"] + "/" + ProjDirName +
+        "/4_FrEIA/4_Compare/Data/Dat_GT__MDS_sample.csv",
+        config["OutPath"] + "/" + ProjDirName +
+        "/4_FrEIA/4_Compare/Data/Dat_GT__sample.csv"
     threads: config["ThreadNr"]
     params:
         outPath = config["OutPath"] + "/" + ProjDirName + "/",
         sampTable = config["Samplesheet"],
         subsResults = config["SubsetResults"],
         regroup = config["Regroup"]
+    conda: "../../envs/FrEIA_env.yaml"
     shell:
         """
-        python3 ../../scripts/FrEIA/4_compare_groups.py \
+        python3 ../../scripts/1_FrEIA/3_compare_groups.py \
         -i {params.outPath} \
         -st {params.sampTable} \
         -t {threads} \
@@ -68,10 +74,13 @@ rule compare_groups:
 # Calculating base and motif fractions per sample.
 rule data_transformation:
     input:
-        (config["OutPath"] + "/" + ProjDirName +
-         "/FrEIA/1_extract_fragment_ends/{sample}.pq")
+        config["OutPath"] + "/" + ProjDirName +
+        "/4_FrEIA/1_extract_fragment_ends/{sample}.pq"
     output:
-        CalcAbOut("{group}", "{sample}")
+        config["OutPath"] + "/" + ProjDirName +
+        "/4_FrEIA/3_Abundances/{group}/{lvl}/M__{sample}.pq",
+        config["OutPath"] + "/" + ProjDirName +
+        "/4_FrEIA/3_Abundances/{group}/{lvl}/T__{sample}.pq",
     params:
         outPath = config["OutPath"] + "/" + ProjDirName + "/",
         sampTable = config["Samplesheet"],
@@ -79,9 +88,10 @@ rule data_transformation:
         fraSizeMax = config["FragmSizeMax"],
         subSamp = config["SubSampleRate"],
         bsSampNr = config["BsSampNr"]
+    conda: "../../envs/FrEIA_env.yaml"
     shell:
         """
-        python3 ../../scripts/FrEIA/3_data_transformation.py \
+        python3 ../../scripts/1_FrEIA/2_data_transformation.py \
         -i {input} \
         -o {params.outPath} \
         -st {params.sampTable} \
@@ -89,4 +99,31 @@ rule data_transformation:
         -fsmax {params.fraSizeMax} \
         -subs {params.subSamp} \
         --bootstrap_sample {params.bsSampNr}
+        """
+
+# Compute the FrEIA score.
+rule FrEIA_score:
+    input:
+        config["OutPath"] + "/" + ProjDirName +
+        "/4_FrEIA/4_Compare/Data/"
+    output:
+        config["OutPath"] + "/" + ProjDirName +
+        "/4_FrEIA/5_FrEIA_score/" + config["ProjName"] + "_corrected_tnc.csv",
+        config["OutPath"] + "/" + ProjDirName +
+        "/4_FrEIA/5_FrEIA_score/" + config["ProjName"] + "_FrEIA_score.csv"
+    params:
+        metaPath = config["MetaPath"],
+        outPath = config["OutPath"] + "/" + ProjDirName +
+                  "/4_FrEIA/5_FrEIA_score/" + config["ProjName"],
+        batch = config["BatchIDs"],
+        threads = config["ThreadNr"]
+    shell:
+        """
+        python3 ../../scripts/1_FrEIA/4_FrEIA_score.py \
+        -i {input} \
+        -o {params.outPath} \
+        -m {params.metaPath} \
+        -b {params.batch} \
+        --gini \
+        -t {params.threads}
         """

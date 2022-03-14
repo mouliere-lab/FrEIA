@@ -1,0 +1,10 @@
+name: Classify
+prefix: ~/miniconda3/envs/Classify
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - pandas=1.2.3
+  - python=3.8
+  - scikit-learn=0.24.1
+  - scikit-bio=0.5.6

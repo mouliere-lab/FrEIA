@@ -114,7 +114,10 @@ def fetchData(args, chromosome):
 
     bamfile.close()
 
-    return CastDataTypes(pd.DataFrame.from_dict(outDict))
+    if len(pd.DataFrame.from_dict(outDict)) > 0:
+        return CastDataTypes(pd.DataFrame.from_dict(outDict))
+    else:
+        return pd.DataFrame.from_dict(outDict)
 
 
 def Main():
@@ -160,7 +163,7 @@ def Main():
 
     pool.close()
     pool.join()
-    print(OutDf.info(memory_usage="deep"))
+    #print(OutDf.info(memory_usage="deep"))
 
     # print(OutDf)
     OutDf.to_parquet(args.output,  # Save the results.

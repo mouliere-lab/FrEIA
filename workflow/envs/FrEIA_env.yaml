@@ -4,25 +4,21 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - bbmap=38.79=h516909a_0
   - biopython=1.78
-  - bwa=0.7.17=hed695b0_7
-  - cutadapt=3.3
   - fastparquet=0.5
-  - fastqc=0.11.9
-  - hmmcopy=0.1.1=hd28b015_2
   - logomaker=0.8
-  - multiqc=1.8
-  - pandas=1.2.3
-  - picard=2.22.2=0
+  - mpmath=1.1.0
+  - numpy=1.18.5
+  - pandas=1.1.5
+  - patsy=0.5.1
   - pip=21.0.1
   - pip:
     - statannot
+    - combat
   - pysam=0.16.0.1
   - python=3.8
-  - qualimap=2.2.2d
   - samtools=1.12
   - scikit-learn=0.24.1
   - scikit-bio=0.5.6
-  - seaborn=0.11.0
-  - snakemake-minimal=5.14.0
+  - seaborn
+  - umap-learn

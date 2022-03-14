@@ -1,8 +1,6 @@
 # ===GENERAL PARAMETERS===
-# Environment deffinition.
-EnvironmentDef: ../../envs/core_pipeline_conda_env_3.yaml
 # The name of the project will be used to separate the runs.
-ProjName: Default_project
+ProjName:
 # Path to the directory containing the sample fastqs.
 SamplePath:
 # Path to the sample sheet.
@@ -14,7 +12,7 @@ OutPath:
 # Path to TMPDIR.
 TmpDir:
 # Number of threads to use.
-ThreadNr: 24
+ThreadNr: 8
 # Choose which trimmer to use. Can be [bbduk, cutadapt, none].
 #Chosing none will turn trimming off.
 Trimmer: bbduk
@@ -31,7 +29,7 @@ FiltQual: 5
 
 #===FREIA | EXTRACT_FRAGMENT_ENDS PARAMETERS===
 # The number of bases to be extracted on the fragment ends.
-nBase: 10
+nBase: 3
 
 #===FREIA | DATA_TRANSFORMATION PARAMETERS===
 # The fraction (between 0 and 1) of reads to use. The default is 1.
@@ -45,6 +43,15 @@ FragmSizeMax: 500
 BsSampNr: 0
 
 #===FREIA | COMPARE_GROUPS PARAMETERS===
-SubsetResults: 10
+# Subset the trinucleotide ends to the firs n with highest proportions.
+# If set to 0 all 64 trinucleotide end proportions will be present in the output.
+SubsetResults: 0
 # The path to the regrouping sheet. If empty will use the original samplesheet.
 Regroup:
+
+#===FREIA | FREIA SCORE PARAMETERS===
+# Path to the metadata file. The following columns are obligatory:
+# sample_name, phenotype
+MetaPath:
+# The name of the column containing the batch IDs in the metadata file.
+BatchIDs: 

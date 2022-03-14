@@ -924,20 +924,21 @@ def GenomeLevelAnalysis(DataDf, sampTDf, Groups, ControlGroup,
                                      MotifAbbr, "sample.csv")))
 
         # Save data files grouped by length and sample.
-        DatOutLenDf = DataDf.groupby(["Base",
-                                      "WhichSample",
-                                      "WhichGroup",
-                                      "Length"],
-                                     observed=True)["RelAbLen"
-                                                    ].mean().reset_index()
-        DatOutLenDf = DatOutLenDf.pivot(index=["WhichSample",
-                                               "WhichGroup",
-                                               "Length"],
-                                        columns="Base",
-                                        values="RelAbLen")
-        DatOutLenDf = DatOutLenDf[Order]
-        DatOutLenDf.to_csv("".join((DataOutPath, "Dat_G",
-                                    MotifAbbr, "length.csv")))
+        # This is ommited in this version.
+        # DatOutLenDf = DataDf.groupby(["Base",
+        #                               "WhichSample",
+        #                               "WhichGroup",
+        #                               "Length"],
+        #                              observed=True)["RelAbLen"
+        #                                             ].mean().reset_index()
+        # DatOutLenDf = DatOutLenDf.pivot(index=["WhichSample",
+        #                                        "WhichGroup",
+        #                                        "Length"],
+        #                                 columns="Base",
+        #                                 values="RelAbLen")
+        # DatOutLenDf = DatOutLenDf[Order]
+        # DatOutLenDf.to_csv("".join((DataOutPath, "Dat_G",
+        #                             MotifAbbr, "length.csv")))
 
         if args.plot:
             # Genome level abundance of the first base.
@@ -1068,7 +1069,8 @@ def GenomeLevelAnalysis(DataDf, sampTDf, Groups, ControlGroup,
                 SavePlot(Plot, "".join((PlotOutPath, "Fig_G",
                                         MotifAbbr, str(numCol), str(n), ".png")
                                        ))
-        LRDf.to_csv("".join((DataOutPath, "Dat_G", MotifAbbr, "linreg.csv")))
+        # This is ommited in this version.
+        # LRDf.to_csv("".join((DataOutPath, "Dat_G", MotifAbbr, "linreg.csv")))
 
     else:  # START OF TRI-, JM- & JT-NUNUCLEOTIDE ANALYSIS
 
@@ -1087,24 +1089,25 @@ def GenomeLevelAnalysis(DataDf, sampTDf, Groups, ControlGroup,
                                      MotifAbbr, "sample.csv")))
 
         # Save data files grouped by length and sample.
-        DatOutLenDf = DataDf.groupby(["Base",
-                                      "WhichSample",
-                                      "WhichGroup",
-                                      "Length"],
-                                     observed=True)["RelAbLen"
-                                                    ].mean().reset_index()
-        DatOutLenDf = DatOutLenDf.pivot(index=["WhichSample",
-                                               "WhichGroup",
-                                               "Length"],
-                                        columns="Base",
-                                        values="RelAbLen")
-        DatOutLenDf = DatOutLenDf[Order]
-        DatOutLenDf.to_csv("".join((DataOutPath, "Dat_G",
-                                    MotifAbbr, "length.csv")))
+        # This is ommited in this version.
+        # DatOutLenDf = DataDf.groupby(["Base",
+        #                               "WhichSample",
+        #                               "WhichGroup",
+        #                               "Length"],
+        #                              observed=True)["RelAbLen"
+        #                                             ].mean().reset_index()
+        # DatOutLenDf = DatOutLenDf.pivot(index=["WhichSample",
+        #                                        "WhichGroup",
+        #                                        "Length"],
+        #                                 columns="Base",
+        #                                 values="RelAbLen")
+        # DatOutLenDf = DatOutLenDf[Order]
+        # DatOutLenDf.to_csv("".join((DataOutPath, "Dat_G",
+        #                             MotifAbbr, "length.csv")))
 
         # Genome level abundance of the first trinucleotide.
         del DatOutSampDf
-        del DatOutLenDf
+        # del DatOutLenDf
         gc.collect()  # freeing memory for following steps.
 
         if args.plot:
@@ -1288,7 +1291,8 @@ def GenomeLevelAnalysis(DataDf, sampTDf, Groups, ControlGroup,
                 SavePlot(Plot, "".join((PlotOutPath, "Fig_G",
                                         MotifAbbr, str(numCol), str(n), ".png")
                                         ))
-        LRDf.to_csv("".join((DataOutPath, "Dat_G", MotifAbbr, "linreg.csv")))
+        # This is ommited in this version.
+        # LRDf.to_csv("".join((DataOutPath, "Dat_G", MotifAbbr, "linreg.csv")))
 
         del LRDf
         gc.collect()  # freeing memory for following steps.
@@ -1351,14 +1355,15 @@ def GenomeLevelAnalysis(DataDf, sampTDf, Groups, ControlGroup,
         MDSDf.rename(columns={"WhichSample": "sample_name",
                               "WhichGroup": "group"},
                      inplace=True)
-        MDSDf.to_csv("".join((DataOutPath, "Dat_G",
-                              MotifAbbr, "MDS_length.csv")),
-                     columns=["sample_name",
-                              "group",
-                              "Length",
-                              "MDS",
-                              "Gini"],
-                     index=False)
+        # This is ommited in this version.
+        # MDSDf.to_csv("".join((DataOutPath, "Dat_G",
+        #                       MotifAbbr, "MDS_length.csv")),
+        #              columns=["sample_name",
+        #                       "group",
+        #                       "Length",
+        #                       "MDS",
+        #                       "Gini"],
+        #              index=False)
 
         # Calculating MDS per sample.
         MDSDf_unit = ThreadMDS(args,
@@ -1471,8 +1476,9 @@ def GenomeLevelAnalysis(DataDf, sampTDf, Groups, ControlGroup,
                                   palette=Palette)
                 SavePlot(Plot, "".join((PlotOutPath, "Fig_G", MotifAbbr,
                                     str(numCol), str(n), ".png")))
-        LRDf.to_csv("".join((DataOutPath, "Dat_G",
-                             MotifAbbr, "MDS_linreg.csv")))
+        # This is ommited in this version.
+        # LRDf.to_csv("".join((DataOutPath, "Dat_G",
+        #                     MotifAbbr, "MDS_linreg.csv")))
 
 
 def ChrLevelAnalysis(DataDf, sampTDf, Groups, ControlGroup, Palette,
@@ -1803,10 +1809,8 @@ def Main():
     # Parse arguments.
     args = ParsingArguments()
 
-    WhichLvl = ["Genome_Lvl", "Chromosome_Lvl", "SubChr_Lvl"]
-    # "Genome_Lvl", "Chromosome_Lvl", "SubChr_Lvl"
-    Prefixes = ["M__", "T__", "P__", "JM__", "JT__"]
-    # "M__", "T__", "P__", "JM__", "JT__"
+    WhichLvl = ["Genome_Lvl"]
+    Prefixes = ["M__", "T__"]
 
     sampTDf = pd.read_csv(args.SampleTable, delim_whitespace=True)
     InputGroups = DetectControl(sampTDf).get("SampleGroups")

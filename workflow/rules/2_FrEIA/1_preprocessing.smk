@@ -14,13 +14,10 @@ elif config["Trimmer"] == "none":
 
 localrules: all_preprocessing
 
-report: (config["OutPath"] + "/" + ProjDirName +
-         "reports/FrEIA_preprocessing.rst")
-
 rule all_preprocessing:
     input:
         expand(config["OutPath"] + "/" + ProjDirName +
-               "/FrEIA/1_extract_fragment_ends/{sample}.pq",
+               "/4_FrEIA/1_extract_fragment_ends/{sample}.pq",
                sample=Samplesheet["sample_name"])
 
 rule filter_and_index_FrEIA:
@@ -32,6 +29,7 @@ rule filter_and_index_FrEIA:
     threads: config["ThreadNr"]
     params:
         qual = config["FiltQual"]
+    conda: "../../envs/FrEIA_env.yaml"
     benchmark:
         (config["OutPath"] + "/benchmark/" +
          ProjDirName + "/2_filter_and_index/{sample}.tsv")
@@ -57,11 +55,12 @@ rule FragmEndSeq:
         tmp_dir + "/2_filter_and_index/{sample}.bam"
     output:
         report(config["OutPath"] + "/" + ProjDirName +
-               "/FrEIA/1_extract_fragment_ends/{sample}.pq",
+               "/4_FrEIA/1_extract_fragment_ends/{sample}.pq",
                category="Fragment end retrieval")
     threads: config["ThreadNr"]
     params:
         nBase = config["nBase"]
+    conda: "../../envs/FrEIA_env.yaml"
     benchmark:
         (config["OutPath"] + "/benchmark/" + ProjDirName +
          "/FrEIA/1_extract_fragment_ends/{sample}.tsv")

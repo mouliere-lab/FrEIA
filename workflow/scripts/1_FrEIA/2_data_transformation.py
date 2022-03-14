@@ -354,9 +354,9 @@ def ReadData(whichGroup, pathToFile, args):
     # by 'subchroff' argument.
     if args.subchroff:
         DataDf = Binning(DataDf, args)
-        whichLvl = ["Genome_Lvl", "Chromosome_Lvl", "SubChr_Lvl"]
+        whichLvl = ["Genome_Lvl"]
     else:
-        whichLvl = ["Genome_Lvl", "Chromosome_Lvl"]
+        whichLvl = ["Genome_Lvl"]
 
     if args.SubSampRepeat and args.SubSampRepeat > 0:
         # Bootstrap sample the reads, and create N random tables.
@@ -369,16 +369,20 @@ def ReadData(whichGroup, pathToFile, args):
                                whichGroup, lvl)
                 TriNcAnalysis(BSSampDf, args, filename_bootstrap,
                               whichGroup, lvl)
-                PolyNcAnalysis(BSSampDf, args, filename_bootstrap,
-                               whichGroup, lvl)
-                JoinedEnds(BSSampDf, args, filename_bootstrap,
-                           whichGroup, lvl)
+                # Joined-end and polynucleotide analysis is not performed
+                # in this version.
+                # PolyNcAnalysis(BSSampDf, args, filename_bootstrap,
+                #                whichGroup, lvl)
+                # JoinedEnds(BSSampDf, args, filename_bootstrap,
+                #            whichGroup, lvl)
     else:
         for lvl in whichLvl:
             MonoNcAnalysis(DataDf, args, filename, whichGroup, lvl)
             TriNcAnalysis(DataDf, args, filename, whichGroup, lvl)
+            # Joined-end and polynucleotide analysis is not performed
+            # in this version.
             # PolyNcAnalysis(DataDf, args, filename, whichGroup, lvl)
-            JoinedEnds(DataDf, args, filename, whichGroup, lvl)
+            # JoinedEnds(DataDf, args, filename, whichGroup, lvl)
 
 
 def Main():
@@ -390,10 +394,10 @@ def Main():
     WhichGroup = sampTDf.loc[sampTDf["sample_name"] == sampleName, "group"
                              ].item().strip("*")
 
-    if args.subchroff:  # Select analysis type.
-        whichLvl = ["Genome_Lvl", "Chromosome_Lvl", "SubChr_Lvl"]
+    if args.subchroff:  # Only genome level analysis is performed in this v.
+        whichLvl = ["Genome_Lvl"]
     else:
-        whichLvl = ["Genome_Lvl", "Chromosome_Lvl"]
+        whichLvl = ["Genome_Lvl"]
 
     CreateFolders(WhichGroup, whichLvl, args)
     ReadData(WhichGroup, args.inPath, args)

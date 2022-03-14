@@ -23,13 +23,6 @@
 # ...even if they are in subdirectories
 !*/
 
-# ...but not in .snakemake/, conda/ or ... directories
+# ...but ignore in .snakemake/ and conda/
 *.snakemake/
 *conda/
-
-# Ignore all new samplesheets
-*samplesheet*
-
-# # if the files to be tracked are in subdirectories
-# !*/a/b/file1.txt
-# !*/a/b/c/*
