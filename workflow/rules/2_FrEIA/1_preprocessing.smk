@@ -63,13 +63,13 @@ rule FragmEndSeq:
     conda: "../../envs/FrEIA_env.yaml"
     benchmark:
         (config["OutPath"] + "/benchmark/" + ProjDirName +
-         "/FrEIA/1_extract_fragment_ends/{sample}.tsv")
+         "/4_FrEIA/1_extract_fragment_ends/{sample}.tsv")
     log:
         (config["OutPath"] + "/logs/" + ProjDirName +
-         "/FrEIA/1_extract_fragment_ends/{sample}.log")
+         "/4_FrEIA/1_extract_fragment_ends/{sample}.log")
     shell:
         """
-        python3 ../../scripts/FrEIA/1_extract_fragment_ends.py \
+        python3 ../../scripts/1_FrEIA/1_extract_fragment_ends.py \
         -b {input} \
         -o {output} \
         -t {threads} \
