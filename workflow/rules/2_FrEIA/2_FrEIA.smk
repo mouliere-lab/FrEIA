@@ -61,6 +61,9 @@ rule compare_groups:
         subsResults = config["SubsetResults"],
         regroup = config["Regroup"]
     conda: "../../envs/FrEIA_env.yaml"
+    log:
+        (config["OutPath"] + "/logs/" + ProjDirName +
+         "/4_FrEIA/4_Compare/FrEIA_compare.log")
     shell:
         """
         python3 ../../scripts/1_FrEIA/3_compare_groups.py \
@@ -89,6 +92,11 @@ rule data_transformation:
         subSamp = config["SubSampleRate"],
         bsSampNr = config["BsSampNr"]
     conda: "../../envs/FrEIA_env.yaml"
+    log:
+        (config["OutPath"] + "/logs/" + ProjDirName +
+         "/4_FrEIA/3_Abundances/{group}/{lvl}/M__{sample}.log"),
+        (config["OutPath"] + "/logs/" + ProjDirName +
+         "/4_FrEIA/3_Abundances/{group}/{lvl}/T__{sample}.log")
     shell:
         """
         python3 ../../scripts/1_FrEIA/2_data_transformation.py \
@@ -105,22 +113,31 @@ rule data_transformation:
 rule FrEIA_score:
     input:
         config["OutPath"] + "/" + ProjDirName +
-        "/4_FrEIA/4_Compare/Data/"
+        "/4_FrEIA/4_Compare/Data/Dat_GM__sample.csv",
+        config["OutPath"] + "/" + ProjDirName +
+        "/4_FrEIA/4_Compare/Data/Dat_GT__MDS_sample.csv",
+        config["OutPath"] + "/" + ProjDirName +
+        "/4_FrEIA/4_Compare/Data/Dat_GT__sample.csv"
     output:
         config["OutPath"] + "/" + ProjDirName +
         "/4_FrEIA/5_FrEIA_score/" + config["ProjName"] + "_corrected_tnc.csv",
         config["OutPath"] + "/" + ProjDirName +
         "/4_FrEIA/5_FrEIA_score/" + config["ProjName"] + "_FrEIA_score.csv"
     params:
+        inPath = config["OutPath"] + "/" + ProjDirName +
+                 "/4_FrEIA/4_Compare/Data/",
         metaPath = config["MetaPath"],
         outPath = config["OutPath"] + "/" + ProjDirName +
                   "/4_FrEIA/5_FrEIA_score/" + config["ProjName"],
         batch = config["BatchIDs"],
         threads = config["ThreadNr"]
+    log:
+        (config["OutPath"] + "/logs/" + ProjDirName +
+         "/4_FrEIA/5_FrEIA_score/FrEIA_score.log")
     shell:
         """
         python3 ../../scripts/1_FrEIA/4_FrEIA_score.py \
-        -i {input} \
+        -i {params.inPath} \
         -o {params.outPath} \
         -m {params.metaPath} \
         -b {params.batch} \

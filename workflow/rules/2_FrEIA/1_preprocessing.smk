@@ -59,7 +59,8 @@ rule FragmEndSeq:
                category="Fragment end retrieval")
     threads: config["ThreadNr"]
     params:
-        nBase = config["nBase"]
+        nBase = config["nBase"],
+        contigs = config["Contigs"]
     conda: "../../envs/FrEIA_env.yaml"
     benchmark:
         (config["OutPath"] + "/benchmark/" + ProjDirName +
@@ -72,6 +73,7 @@ rule FragmEndSeq:
         python3 ../../scripts/1_FrEIA/1_extract_fragment_ends.py \
         -b {input} \
         -o {output} \
+        -c {params.contigs} \
         -t {threads} \
         -n {params.nBase} \
         2> {log}

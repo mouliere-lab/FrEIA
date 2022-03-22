@@ -34,6 +34,11 @@ def ParsingArguments():
                         type=str,
                         required=False,
                         help="Path to the output file.")
+    parser.add_argument("-c", "--contigs",
+                        dest="contigs",
+                        type=str,
+                        required=True,
+                        help="List of contig names separated by a coma.")
     return parser.parse_args()
 
 
@@ -90,25 +95,26 @@ def fetchData(args, chromosome):
             continue
         else:
             mate = readCache[read.query_name]
-
-            outDict["qname"].append(read.query_name)
-            outDict["chr"].append(bamfile.get_reference_name(read.reference_id)
-                                  )
-            outDict["read_len"].append(abs(read.template_length))
-            outDict["strand"].append(0)
-            outDict["leftmost_nc_pos"].append(read.reference_start)
-            outDict["rightmost_nc_pos"].append(read.reference_start
-                                               + read.template_length)
-
             SeqDict = getReadSeq(read, mate, nrBase)  # Get the sequences.
 
-            outDict["leftmost_nc_seq"].append(SeqDict.get("P1_seq")[0])
-            outDict["rightmost_nc_seq"].append(SeqDict.get("P2_seq")[0])
-            outDict["leftmost_tnc_seq"].append(SeqDict.get("P1_seq")[:3])
-            outDict["rightmost_tnc_seq"].append(SeqDict.get("P2_seq")[:3])
-            outDict["leftmost_read_seq"].append(SeqDict.get("P1_seq"))
-            outDict["rightmost_read_seq"].append(SeqDict.get("P2_seq"))
-            outDict["gccont"].append(SeqDict.get("GC_cont"))
+            if ((SeqDict.get("P1_seq") != "") &
+               (SeqDict.get("P2_seq") != "")):
+                outDict["qname"].append(read.query_name)
+                outDict["chr"].append(bamfile.get_reference_name(read.reference_id)
+                                      )
+                outDict["read_len"].append(abs(read.template_length))
+                outDict["strand"].append(0)
+                outDict["leftmost_nc_pos"].append(read.reference_start)
+                outDict["rightmost_nc_pos"].append(read.reference_start
+                                                   + read.template_length)
+
+                outDict["leftmost_nc_seq"].append(SeqDict.get("P1_seq")[0])
+                outDict["rightmost_nc_seq"].append(SeqDict.get("P2_seq")[0])
+                outDict["leftmost_tnc_seq"].append(SeqDict.get("P1_seq")[:3])
+                outDict["rightmost_tnc_seq"].append(SeqDict.get("P2_seq")[:3])
+                outDict["leftmost_read_seq"].append(SeqDict.get("P1_seq"))
+                outDict["rightmost_read_seq"].append(SeqDict.get("P2_seq"))
+                outDict["gccont"].append(SeqDict.get("GC_cont"))
 
         del readCache[read.query_name]
 
@@ -124,30 +130,7 @@ def Main():
     # Tt = time.time()
     args = ParsingArguments()
 
-    ChrL = ["chr1",
-            "chr2",
-            "chr3",
-            "chr4",
-            "chr5",
-            "chr6",
-            "chr7",
-            "chr8",
-            "chr9",
-            "chr10",
-            "chr11",
-            "chr12",
-            "chr13",
-            "chr14",
-            "chr15",
-            "chr16",
-            "chr17",
-            "chr18",
-            "chr19",
-            "chr20",
-            "chr21",
-            "chr22",
-            "chrM"
-            ]
+    ChrL = args.contigs.split(",")
 
     OutDf = pd.DataFrame()
 

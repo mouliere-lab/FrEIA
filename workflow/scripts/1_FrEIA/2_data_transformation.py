@@ -353,7 +353,7 @@ def ReadData(whichGroup, pathToFile, args):
     # Bin the datasets by genomic positions. This feature can be turned off
     # by 'subchroff' argument.
     if args.subchroff:
-        DataDf = Binning(DataDf, args)
+        # DataDf = Binning(DataDf, args)
         whichLvl = ["Genome_Lvl"]
     else:
         whichLvl = ["Genome_Lvl"]
