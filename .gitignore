@@ -19,6 +19,7 @@
 !*.txt
 !*.sizes
 !*.bedGraph
+!LICENSE
 
 # ...even if they are in subdirectories
 !*/
