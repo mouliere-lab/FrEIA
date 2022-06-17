@@ -1,18 +1,18 @@
 # ===GENERAL PARAMETERS===
-# The name of the project will be used to separate the runs.
+# 1. The name of the project will be used to separate the runs.
 ProjName:
-# Path to the directory containing the sample fastqs.
+# 2. Path to the directory containing the sample fastqs.
 SamplePath:
-# Path to the sample sheet.
+# 3. Path to the sample sheet.
 Samplesheet: ../../../config/samplesheet.csv
-# Indexed reference path.
+# 4. Indexed reference path.
 RefPath:
-# Output path.
+# 5. Output path.
 OutPath:
-# Path to TMPDIR.
+# 6. Path to TMPDIR.
 TmpDir:
-# Number of threads to use.
-ThreadNr: 8
+# 7. Number of threads to use.
+ThreadNr: 4
 # Choose which trimmer to use. Can be [bbduk, cutadapt, none].
 #Chosing none will turn trimming off.
 Trimmer: bbduk
@@ -55,8 +55,9 @@ SubsetResults: 0
 Regroup:
 
 #===FREIA | FREIA SCORE PARAMETERS===
-# Path to the metadata file. The following columns are obligatory:
+# 8. Path to the metadata file. The following columns are obligatory:
 # sample_name, phenotype
-MetaPath:
-# The name of the column containing the batch IDs in the metadata file.
-BatchIDs:
+MetaPath: 
+# To perform batch correction type the name of the column containing
+# the batch IDs in the metadata file. Default: None
+BatchIDs: None

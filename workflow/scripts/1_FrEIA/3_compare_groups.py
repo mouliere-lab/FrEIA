@@ -702,8 +702,9 @@ def ReadData(args, sampTDf, WhichGroup, prefix, lvl):
     DataDf = DataDf.merge(metaDf, on="WhichSample", how="left")
 
     # Cast data types for memory and run efficiency.
-    DataDf = CastDataTypes(DataDf)
-
+    if len(DataDf) > 0:
+        DataDf = CastDataTypes(DataDf)
+    print(DataDf.dropna(inplace=True))
     return DataDf
 
 
@@ -858,6 +859,7 @@ def GenomeLevelAnalysis(DataDf, sampTDf, Groups, ControlGroup,
                                    "WhichSample",
                                    "WhichGroup",
                                    "Pos"],
+                                   "WhichGroup",
                                   observed=True)["RelAbSamp"
                                                  ].mean().reset_index()
         DatOutDf = DatOutDf.pivot(index=["WhichSample",
@@ -874,7 +876,6 @@ def GenomeLevelAnalysis(DataDf, sampTDf, Groups, ControlGroup,
                            "line",
                            "Pos",
                            "RelAbSamp",
-                           "WhichGroup",
                            None,
                            "Base",
                            2,
@@ -919,6 +920,7 @@ def GenomeLevelAnalysis(DataDf, sampTDf, Groups, ControlGroup,
                                                  "WhichGroup"],
                                           columns="Base",
                                           values="RelAbSamp")
+
         DatOutSampDf = DatOutSampDf[Order]
         DatOutSampDf.to_csv("".join((DataOutPath, "Dat_G",
                                      MotifAbbr, "sample.csv")))

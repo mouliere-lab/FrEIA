@@ -6,7 +6,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.colors as mcolors
 
-# This script bins the reads.
+# Tools for fragment end data manipulations.
 ChrLen = {"chr1": 248956422,
           "chr2": 242193529,
           "chr3": 198295559,

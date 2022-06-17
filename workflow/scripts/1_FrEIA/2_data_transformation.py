@@ -204,7 +204,6 @@ def TriNcAnalysis(SampleDf, args, filename, group, lvl):
         whichEnd = ["leftmost_tnc_seq"]
 
     BCDf = BaseCompAbCalc(SampleDf, group, whichEnd, lvl)
-
     # Save the results.
     BCDf.to_parquet("".join((args.output, "4_FrEIA/3_Abundances/",
                              group, "/", lvl, "/T__", filename, ".pq")),

@@ -26,6 +26,7 @@ if config["Trimmer"] == "cutadapt":
             R1 = tmp_dir + "/1_trimming/{cutadapt_sample}_R1.fq.gz",
             R2 = tmp_dir + "/1_trimming/{cutadapt_sample}_R2.fq.gz"
         threads: config["ThreadNr"]
+        conda: "../../envs/Preprocessing_env.yaml"
         benchmark:
             (config["OutPath"] + "/benchmark/" +
              ProjDirName + "/1_trimming/{cutadapt_sample}.tsv")
@@ -75,6 +76,7 @@ elif config["Trimmer"] == "bbduk":
             flags = config["BbdukFlags"]
         threads:
             config["ThreadNr"]
+        conda: "../../envs/Preprocessing_env.yaml"
         benchmark:
             config["OutPath"] + "/benchmark/" +
             ProjDirName + "/1_trimming/{bbduk_sample}.tsv"

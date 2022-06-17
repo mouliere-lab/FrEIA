@@ -1,74 +1,162 @@
 # FrEIA - Fragment End Integrated Analysis
 
-This workflow contains tools for pre-processing as well as
-Fragment end sequence analysis of cfDNA data.
+## Contents
+- [Overview](#overview)
+- [Repo Contents](#repo-contents)
+- [System Requirements](#system-requirements)
+- [Installation Guide](#installation-guide)
+- [Demo](#demo)
+- [Results](#results)
+- [License](./LICENSE)
+- [Citation](#citation)
 
-1. Pre-processing of sequencing reads
-1.1. Trimming by either BBduk or Cutadapt.
-1.2. Mapping by bwa mem.
-1.3. Reads are filtered by Samtools and Picard
-1.4. Quality control by FastQC and Qualimap and is summarized by MultiQC.
+## Overview
+During cell death the DNA of tumor cells is released in to the bloodstream,
+forming a pool of circulating tumor DNA (cfDNA). The cleavage of DNA originating
+from cancer cells is aberrant compared to that of healthy cells, resulting in
+shifted fragment end sequence signature. This can be leveraged to detect cancer
+from low pass whole genome sequencing data.
+The Fragment End Integrated Analysis tool extracts the proportion of fragment
+end sequences and computes the diversity of these. Based on these metrics it
+calculates a FrEIA score.
 
-2. Fragment end sequence analysis
-2.1. Fragment end sequence analysis by the Fragment End Integrated Analysis (FrEIA) tool.
-2.2. FrEIA score calculation
+## Repo Contents
+ - [FrEIA pipeline](./workflow)
 
-3. Classification toolkit
+## System Requirements
 
-## Methodology and citation
-Moldovan et al. Genome-wide cell-free DNA termini in patients with cancer. (2021)
+### Hardware Requirements
+The FrEIA pipeline is designed to run on HPC clusters, as some steps can be
+resource-heavy with real-world data sets.
 
-## 1. Installing dependencies
-Install [Anaconda][1].
+If ran on a standard computer, we recommend:
+RAM: 16+ GB
+CPU: 4+ cores, 3.3+ GHz/core
 
-## 2. Downloading the FrEIA pipeline
-First create a directory to store the workflow:
-```mkdir FrEIA
-cd FrEIA
-Then download the workflow:
-wget https://github.com/mouliere-lab/FrEIA.git
-or
+### Software Requirements
+
+The package is tested on an Ubuntu 20.04.4 LTS operating system, but a it should
+work on [Windows Subsystem for Linux (WSL)][1] as well.
+
+## Installation Guide
+
+### Package Dependencies
+Prior to downloading FrEIA users should install [Anaconda][2].
+
+FrEIA uses [Snakemake][3] for reproducibility.
+Install Snakemake by running:
+```
+conda create -n snakemake -c bioconda snakemake
+```
+Activate your environment:
+```
+conda activate snakemake
+```
+Snakemake uses Mamba, a fast package manager. To install it type:
+```
+conda install mamba -n base -c conda-forge
+```
+Snakemake requires strict channel priorities in Conda, which is also good for
+reproducibility. To set this, type:
+```
+conda config --set channel_priority strict
+```
+Every other dependency will be installed automatically during the first run of
+the pipeline.
+Software versions used by the pipeline can be found in the environment files
+in the [envs](./workflow/envs/) folder.
+
+In short the pipeline uses:
+[BBduk][6] or [Cutadapt][7] for adapter trimming.
+[BWA MEM][8] for mapping.
+[Samtools][9] and [Sambamba][10] for quality filtering and marking duplicates.
+[Qualimap][11] for quality control summarized by [MultiQC][12].
+
+### Downloading FrEIA
+Download FrEIA by:
+```
+wget https://github.com/mouliere-lab/FrEIA/archive/refs/heads/main.zip &&
+unzip main.zip &&
+mv FrEIA-main FrEIA &&
+rm main.zip
+```
+or if you have Git installed:
+```
 git clone https://github.com/mouliere-lab/FrEIA.git
 ```
-## 3. Changing input file extensions to expected format
-The FrEIA pipeline recognizes files with a `.fq.gz` extension. If your files
-have a different extension use the script in `workflow/scripts/0_raw_seq/1_raw_renaming.sh`
-to change it.
 
-## 4. Setting the path to the input files
-You can set the path to the files you want to use in `config/config.yaml`.
-All the input files must be in the same directory.
+## Demo
+The FrEIA pipeline accepts paired sequencing files with `.fq.gz` extension.
+If your files have a different extension use the script in
+`workflow/scripts/0_raw_seq/1_raw_renaming.sh` to change it.
 
-## 5. Creating a sample sheet
-The sample sheet is a space-delimited file with two labels in its header:
-`group` `sample_name`
+### Dummy Data Set
+To run this demo please download [these dummy files][4].
+The dummy files are a synthetic admixtures of real sequencing files from healthy
+controls and cancer patients respectively, downsampled to 100K reads.
+The downloaded file contains a `metadata.csv` file used for the FrEIA score
+calculation and machine learning classification.
+This file contains the phenotype of the samples.
 
-An example can be found in the `config` directory.
+### Creating the Sample Sheet
+The [sample sheet](./config/samplesheet.csv) is a space-delimited `.csv` file
+with two labels in its header: `sample_name group`
 
-`group` represents the single test group the given file belongs to. You can add as many
-test groups as you prefer. For the final step of the FrEIA analysis a control
-group is needed. Mark this with a `*` following the group name.
+An example containing the dummy file names can be found in the
+[config](./config) directory.
 
-`sample_name` is the name of the unique name of the sample (file). For each pair of
+`sample_name` is the unique name of the sample (file). For each pair of
 input files there is one unique sample name, which is the file name minus
 the `_R1(2).fq.gz` suffix.
 
-Set the path to the sample sheet in `config/config.yaml`.
+`group` represents the single analysis group the given file belongs to. For the
+final steps of the FrEIA analysis a control group is needed. Mark this with a
+`*` following the group name.
 
-## 6. Setting the reference genome
-You can set the path to the reference genome in `config/config.yaml`.
+### Using the Config File
+The [config file](./config/config.yaml) is a `.yaml` format file containing the
+parameters used during the run.
 
-## 7. Setting the output location.
-By default the results will be placed in the results directory.
-You can change the path to the output directory in `config/config.yaml`.
+#### 1. Set the project name
+This will be used as the name of the main folder containing results.
+#### 2. Set the sample path
+Add the path to the folder containing the `.fq.gz` files.
+#### 3. Set the path to the sample sheet
+Add the path to the sample sheet file.
+#### 4. Set the path to the reference genome
+Add the path to the indexed reference genome.
+#### 5. Set the output path
+Add the path to the output folder. A folder with the project name will be
+created here containing all the results.
+#### 6. Set the path to a temporary folder
+The temporary folder (tmp) will be used to store temporary files. On HPC clusters
+this should be on a `scratch drive` with fast read/write capability.
+#### 7. Set the number of CPU cores the pipeline can use
+The number of CPU cores should be less or equal to the available cores.
+On a normal computer this is usually 4 or 8.
+If you use a HPC cluster be aware that with the increase of the core number
+the memory usage can also increase.
+#### 8. Set the path to the metadata file
+The metadata file is a space-delimited `.csv` file with two obligatory fields:
+`sample_name phenotype`. The `sample_name` should be the same as in the
+`samplesheet.csv` file. The `phenotype` can be anything, here we use control
+and cancer. This file can contain batch information, for which the data will be
+corrected for.
+#### 9. Set the column containing the batch information
+Fragment end sequence proportions are prone for batch effects. We correct this
+using [pycombat][5]. You can set batch information in a new column in the
+`metadata.csv` file. The name of this column should be set in the
+[config file](./config/config.yaml).
+Dummy files are coming from the same batch, so `None` is passed as parameter.
 
-## 8. Running the FrEIA pipeline on a HPC cluster using Snakemake and Slurm
-This is the recomended way of running the pipeline, as some steps are resource-heavy.
+### Running FrEIA on a HPC cluster using Snakemake and Slurm
+This is the recommended way of running the pipeline, as some steps are
+resource-heavy.
 Rules of the pipeline are run separately. To run a rule, first change directories
-into the rule's folder
-for example `cd workflow/rules/1_preprocessing/`
+into the rule's folder for example `cd workflow/rules/1_preprocessing/`
 and run snakemake with the `-s` argument followed by the rule name
-for example trim the reads by running:
+
+For example trim the reads by running:
 ```
 snakemake --printshellcmds \
           --keep-going \
@@ -87,14 +175,20 @@ snakemake --printshellcmds \
           --max-status-checks-per-second 5 \
           -s 1_trimming.smk
 ```
-## 9. Running the FrEIA pipeline on a local machine using Snakemake and Slurm
-Running on a local machine is not recomended as some steps may exceed ther
-available resources.
-Rules of the pipeline are run separately. To run a rule, first change directories
-into the rule's folder
-for example `cd workflow/rules/1_preprocessing/`
-and run snakemake with the `-s` argument followed by the rule name
-for example trim the reads by running:
+### Running FrEIA on a local machine using Snakemake
+Running on a local machine is not recommended as some steps may exceed available
+resources.
+Rules of the pipeline are run separately. To run a rule, first change
+directories into the rule's folder and run snakemake with the `-s` argument
+followed by the rule name.
+
+In the Demo we are running FrEIA on a local machine.
+Expected run time: ~ 1.5 h
+
+#### 1. Trimming
+Change directory: `cd workflow/rules/1_preprocessing/`
+
+Remove sequencing adapters by running:
 ```
 snakemake --printshellcmds \
           --keep-going \
@@ -103,38 +197,72 @@ snakemake --printshellcmds \
           -s 1_trimming.smk
 ```
 
-## Inputs
-The FrEIA pipeline accepts paired `fq.gz` files.
+#### 2. Mapping
+Align the reads to the previously set reference genome by running:
+```
+snakemake --printshellcmds \
+          --keep-going \
+          --use-conda \
+          --cores 8 \
+          -s 2_mapping.smk
+```
 
-## Outputs
-The workflow creates the following output structure and outputs:
+#### 3. Run FrEIA
+Change directory: `cd ../2_FrEIA`.
+
+Extract the fragment ends by running:
+```
+snakemake --printshellcmds \
+          --keep-going \
+          --use-conda \
+          --cores 8 \
+          -s 1_preprocessing.smk
+```
+
+Calculate fragment end proportions and the FrEIA score:
+```
+snakemake --printshellcmds \
+          --keep-going \
+          --use-conda \
+          --cores 8 \
+          -s 2_FrEIA.smk
+```
+### Results
+In the output folder the following files and folders should be created:
+
 ```
 .
-└── results/
+└── output_folder/
     └── trimmed/
-        ├── 1_trimming_quality/ - QC results of the trimmed files.
-        │   └── multiqc/ - aggregate of the QC results.
         ├── 1_mapping/ - Mapped bam files.
         ├── 1_mapping_flagstat/ - Flagstat output of mapped files.
         ├── 1_mapping_quality/ - QC results of the mapped files.
-        │   └── multiqc/ - aggregate of the QC results.
+        │   └── multiqc/ - Aggregate of the QC results.
         └── 4_FrEIA/
-            ├── 1_extract_fragment_ends/ - Data files containing data used by FrEIA.
+            ├── 1_extract_fragment_ends/ - Data files containing fragment end data per read.
             ├── 3_Abundances/
-                └── Genome_Lvl/ - genome level abundance data.
-            ├── 4_Compare/ - the results of the FrEIA analysis comparing the groups of the data.
+                └── Genome_Lvl/ - Genome level aggregated fragment end sequence abundance data.
+            ├── 4_Compare/
+                └── Data/- Aggregated fragment end sequence proportions and diversity.
             └── 5_FrEIA_score/ - the FrEIA scores and related data (batch corrected trinucleotide end proportions, logFC of the trinucleotide end proportions).
 ```
-## Parameters and configuration
-Parameters can be set in the `config.yaml` file found in the `config` directory.
-To set or modify a path or parameter change the values after the `keyword:`.
+Please download the expected results from [here][13]. The expected results
+archive contains the expected folder structure, quality check results and the
+final files with fragment end sequence proportions, diversity and FrEIA score
+of the dummy data set.
 
-# Machine learning classification
-Classification can be performed separately from the workflow by running
+## Citation
+For usage of the pipeline or the FrEIA tool alone please cite:
+Moldovan et al. Genome-wide cell-free DNA biological patterns in patients with cancer. (2022)
+
+## Machine learning classification
+Classification is performed separately from the workflow by running
 `2_classification/classify.py`.
+
 Before running the script install dependencies:
 `conda env create -f /envs/Classify_env.yaml -n Classify`
 `conda activate Classify`
+
 To run the classifier:
 `python3 workflow/scripts/2_classification/classify.py \
     -i <path/to/input.csv> \
@@ -159,5 +287,16 @@ The outputs of the classification:
 `_metrics_predict.csv`: different performance metrics of the prediction.
 `_roc_predict.csv`: the FPR and TPR rates at different thresholds.
 
-[1]: https://docs.anaconda.com/anaconda/install/linux/
-[2]: https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html
+[1]: https://docs.microsoft.com/en-us/windows/wsl/install
+[2]: https://docs.anaconda.com/anaconda/install/linux/
+[3]: https://snakemake.github.io/
+[4]: https://doi.org/10.6084/m9.figshare.20090063.v1
+[5]: https://github.com/epigenelabs/pyComBat
+[6]: https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/
+[7]: https://cutadapt.readthedocs.io/en/stable/
+[8]: http://bio-bwa.sourceforge.net/bwa.shtml
+[9]: http://www.htslib.org/
+[10]: https://lomereiter.github.io/sambamba/
+[11]: http://qualimap.conesalab.org/
+[12]: https://multiqc.info/
+[13]: https://doi.org/10.6084/m9.figshare.20090162.v1

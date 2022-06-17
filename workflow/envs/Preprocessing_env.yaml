@@ -8,7 +8,8 @@ dependencies:
   - bwa=0.7.17=hed695b0_7
   - cutadapt=3.3
   - fastqc=0.11.9
-  - multiqc=1.8
-  - picard=2.22.2=0
+  - pip:
+    - multiqc==1.12
   - qualimap=2.2.2d
+  - sambamba=0.8.1
   - samtools=1.12

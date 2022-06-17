@@ -55,6 +55,7 @@ rule compare_groups:
         config["OutPath"] + "/" + ProjDirName +
         "/4_FrEIA/4_Compare/Data/Dat_GT__sample.csv"
     threads: config["ThreadNr"]
+    conda: "../../envs/FrEIA_env.yaml"
     params:
         outPath = config["OutPath"] + "/" + ProjDirName + "/",
         sampTable = config["Samplesheet"],
@@ -131,6 +132,7 @@ rule FrEIA_score:
                   "/4_FrEIA/5_FrEIA_score/" + config["ProjName"],
         batch = config["BatchIDs"],
         threads = config["ThreadNr"]
+    conda: "../../envs/FrEIA_env.yaml"
     log:
         (config["OutPath"] + "/logs/" + ProjDirName +
          "/4_FrEIA/5_FrEIA_score/FrEIA_score.log")

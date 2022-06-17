@@ -76,10 +76,11 @@ def argumentparsing():
 
 def mannwhitneyu_test_worker(dat_Df, b):
     dat_Df = dat_Df[dat_Df.base == b]
+
     if (len(dat_Df[dat_Df.phenotype == "cancer"].Proportion) > 0 and
        len(dat_Df[dat_Df.phenotype == "control"].Proportion) > 0):
-        U1, p = mannwhitneyu(dat_Df[dat_Df.phenotype == "cancer"].Proportion,
-                             dat_Df[dat_Df.phenotype == "control"].Proportion)
+        U1, p = mannwhitneyu(dat_Df[dat_Df.phenotype == "cancer"].Proportion.tolist(),
+                             dat_Df[dat_Df.phenotype == "control"].Proportion.tolist())
     else:
         p = 1
 
@@ -89,6 +90,7 @@ def mannwhitneyu_test_worker(dat_Df, b):
 
 
 def mannwhitneyu_test(dat_Df, meta_df, args):
+
     dat_Df = dat_Df.merge(meta_df[["sample_name",
                                    "phenotype"]])
     # Compare the distribution of phenotypes per base and
@@ -136,7 +138,7 @@ def get_signif_bases(dat_Df):
                            (dat_Df["Log10FC"] < Q25)].base.tolist()
     cancer_base_L = dat_Df[(dat_Df["p-val"] < 0.01) &
                           (dat_Df["Log10FC"] > Q75)].base.tolist()
-    print(cancer_base_L)
+    #print(cancer_base_L)
     return control_base_L, cancer_base_L
 
 
@@ -181,25 +183,29 @@ def batch_correction(dat_Df, batch_L, control_L, val_name, args):
     dat_Df.drop(["sample_name"],
                 inplace=True)
 
-    # UMAP projection of controls.
-    umap_projection(dat_Df[control_L],
-                    batch_L[batch_L.phenotype == "control"][args.batches].reset_index(drop=True),
-                    "_".join(("raw",
-                              val_name)),
-                    args)
-
-    # Perform batch correction.
-    out_Df = pycombat(dat_Df.astype("float"), batch_L[args.batches])
-
-    try:
-        # UMAP projection.
-        umap_projection(out_Df[control_L],
+    if args.batches != 'None':
+        # UMAP projection of controls.
+        umap_projection(dat_Df[control_L],
                         batch_L[batch_L.phenotype == "control"][args.batches].reset_index(drop=True),
-                        "_".join(("corrected",
+                        "_".join(("raw",
                                   val_name)),
                         args)
-    except ValueError:
-        print("Batch correction resulted in NaNs. UMAP projection skipped!")
+
+        # Perform batch correction.
+        out_Df = pycombat(dat_Df.astype("float"), batch_L[args.batches])
+
+        try:
+            # UMAP projection.
+            umap_projection(out_Df[control_L],
+                            batch_L[batch_L.phenotype == "control"][args.batches].reset_index(drop=True),
+                            "_".join(("corrected",
+                                      val_name)),
+                            args)
+        except ValueError:
+            print("Batch correction resulted in NaNs. UMAP projection skipped!")
+
+    else:
+        out_Df = dat_Df
 
     out_Df["base"] = out_Df.index
 
@@ -232,6 +238,7 @@ def euclidean_worker(samp_df, control_df, cancer_df, args, samp):
                            "Control_ED": [control_dist],
                            "Cancer_ED": [cancer_dist],
                            "FrEIA_score": [FrEIA_score]})
+
     return out_Df
 
 
@@ -296,7 +303,7 @@ def main():
     div_Df = pd.read_csv("".join((args.input, "/", "Dat_GT__MDS_sample.csv")),
                           sep=",")  # Read diversity.
     meta_Df = pd.read_csv(args.metadata,
-                          sep=",")  # Read metadata.
+                          sep=" ")  # Read metadata.
 
     prop_Df.rename(columns={"WhichSample": "sample_name",
                             "WhichGroup": "group"},
@@ -306,21 +313,28 @@ def main():
 
     control_L = meta_Df[meta_Df.phenotype == "control"].sample_name.tolist()
 
-    if args.batches:  # Perform batch correction.
+    if args.batches != 'None':  # Perform batch correction.
         batch_L = meta_Df[["phenotype", args.batches]]
-        prop_Df = batch_correction(prop_Df, batch_L, control_L, "Proportion", args)
-        if args.use_mds:
-            div_Df = batch_correction(div_Df, batch_L, control_L, "MDS", args)
-        elif args.use_gini:
-            div_Df = batch_correction(div_Df, batch_L, control_L, "Gini", args)
+    else:
+        batch_L = ["None"]
 
-        # Save the corrected data.
-        prop_Df.to_csv("".join((args.outpath,
-                                "_corrected_tnc.csv")),
-                       index=False)
-        div_Df.to_csv("".join((args.outpath,
-                               "_corrected_div.csv")),
-                      index=False)
+    prop_Df = batch_correction(prop_Df, batch_L, control_L, "Proportion", args)
+    prop_Df.Proportion = pd.to_numeric(prop_Df.Proportion)
+
+    if args.use_mds:
+        div_Df = batch_correction(div_Df, batch_L, control_L, "MDS", args)
+        div_Df.MDS = pd.to_numeric(div_Df.MDS)
+    elif args.use_gini:
+        div_Df = batch_correction(div_Df, batch_L, control_L, "Gini", args)
+        div_Df.Gini = pd.to_numeric(div_Df.Gini)
+
+    # Save the corrected data.
+    prop_Df.to_csv("".join((args.outpath,
+                            "_corrected_tnc.csv")),
+                   index=False)
+    div_Df.to_csv("".join((args.outpath,
+                           "_corrected_div.csv")),
+                  index=False)
 
     mwu_Df = mannwhitneyu_test(prop_Df,
                                meta_Df,
@@ -340,10 +354,11 @@ def main():
 
     # Subset prop_Df to contain only the significant bases.
     prop_Df = prop_Df[prop_Df.base.isin(control_base_L + cancer_base_L)].reset_index(drop=True)
-
+    print(control_base_L + cancer_base_L)
     # Select base from div_df that were significant in prop_df.
-    sign_base_L = ["_".join((e.split("_")[0],
-                             e.split("_")[1])) for e in control_base_L + cancer_base_L]
+    sign_base_L = control_base_L + cancer_base_L
+    #sign_base_L = ["_".join((e.split("_")[0],
+    #                         e.split("_")[1])) for e in control_base_L + cancer_base_L]
     div_Df = div_Df[div_Df.base.isin(sign_base_L)]
 
     # Add the phenotype column to diversity Df.
@@ -360,6 +375,6 @@ def main():
                                    "_FrEIA_score.csv")),
                           index=False)
     #print(prop_Df.info(memory_usage="deep"))
-    #print(prop_Df)
+    #print(FrEIA_score_df)
 if __name__ == "__main__":
     main()
