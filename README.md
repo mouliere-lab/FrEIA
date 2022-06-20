@@ -124,6 +124,10 @@ Add the path to the folder containing the `.fq.gz` files.
 #### 3. Set the path to the sample sheet
 Add the path to the sample sheet file.
 #### 4. Set the path to the reference genome
+The pipeline maps the reads to a reference genome. To do this, you first need
+to index the reference using BWA MEM. A tutorial to index the reference genome
+can be found [here][8]. Indexing large genomes can take from minutes to hours
+butt needs to be done only once.
 Add the path to the indexed reference genome.
 #### 5. Set the output path
 Add the path to the output folder. A folder with the project name will be
@@ -186,7 +190,7 @@ In the Demo we are running FrEIA on a local machine.
 Expected run time: ~ 1.5 h
 
 #### 1. Trimming
-Change directory: `cd workflow/rules/1_preprocessing/`
+Change directory: `cd FrEIA/workflow/rules/1_preprocessing/`
 
 Remove sequencing adapters by running:
 ```
@@ -251,10 +255,6 @@ archive contains the expected folder structure, quality check results and the
 final files with fragment end sequence proportions, diversity and FrEIA score
 of the dummy data set.
 
-## Citation
-For usage of the pipeline or the FrEIA tool alone please cite:
-Moldovan et al. Genome-wide cell-free DNA biological patterns in patients with cancer. (2022)
-
 ## Machine learning classification
 Classification is performed separately from the workflow by running
 `2_classification/classify.py`.
@@ -286,6 +286,10 @@ The outputs of the classification:
 `_confmat.csv`: the confusion matrix of the prediction.
 `_metrics_predict.csv`: different performance metrics of the prediction.
 `_roc_predict.csv`: the FPR and TPR rates at different thresholds.
+
+## Citation
+For usage of the pipeline or the FrEIA tool alone please cite:
+Moldovan et al. Genome-wide cell-free DNA biological patterns in patients with cancer. (2022)
 
 [1]: https://docs.microsoft.com/en-us/windows/wsl/install
 [2]: https://docs.anaconda.com/anaconda/install/linux/
