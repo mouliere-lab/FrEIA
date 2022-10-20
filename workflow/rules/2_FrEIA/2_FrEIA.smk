@@ -128,6 +128,11 @@ rule FrEIA_score:
         inPath = config["OutPath"] + "/" + ProjDirName +
                  "/4_FrEIA/4_Compare/Data/",
         metaPath = config["MetaPath"],
+        ctrName = config["CtrName"],
+        casName= config["CasName"],
+        panelMed = config["PanelMed"],
+        tncCtr = config["TncCtr"],
+        tncCas= config["TncCas"],
         outPath = config["OutPath"] + "/" + ProjDirName +
                   "/4_FrEIA/5_FrEIA_score/" + config["ProjName"],
         batch = config["BatchIDs"],
@@ -142,6 +147,11 @@ rule FrEIA_score:
         -i {params.inPath} \
         -o {params.outPath} \
         -m {params.metaPath} \
+        --control_name {params.ctrName} \
+        --case_name {params.casName} \
+        -p {params.panelMed} \
+        --tnc_control {params.tncCtr} \
+        --tnc_case {params.tncCas} \
         -b {params.batch} \
         --gini \
         -t {params.threads}

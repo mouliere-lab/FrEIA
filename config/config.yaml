@@ -58,6 +58,16 @@ Regroup:
 # 8. Path to the metadata file. The following columns are obligatory:
 # sample_name, phenotype
 MetaPath: 
-# To perform batch correction type the name of the column containing
+# 9. To perform batch correction type the name of the column containing
 # the batch IDs in the metadata file. Default: None
 BatchIDs: None
+# 10. Path to the panel of medians.
+# A preset panel of medians is provided in rhe resources directory.
+# To create you own panel of medians please use the Create_panels.py tool provided with FrEIA.
+PanelMed: ../../../resources/FrEIA/panel_medians.csv
+# 11. The name of control and case samples in the metadata file.
+CtrName: control
+CasName: cancer
+# 12. List of trinucleotides used to compute the FrEIA score.
+TncCtr: ACA,ACC,ACT,CAC,CAT,CCA,CCC,CCT,CGA,CGC,CGT,CTT,GAC,GGC,TCT
+TncCas: AAG,ACG,AGA,AGG,ATA,ATG,CCG,GAG,GCG,GGG,GTA,GTG,TCG,TTA,TTC,TTG

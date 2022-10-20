@@ -141,7 +141,7 @@ On a normal computer this is usually 4 or 8.
 If you use a HPC cluster be aware that with the increase of the core number
 the memory usage can also increase.
 #### 8. Set the path to the metadata file
-The metadata file is a space-delimited `.csv` file with two obligatory fields:
+The metadata file is a coma-delimited `.csv` file with two obligatory fields:
 `sample_name phenotype`. The `sample_name` should be the same as in the
 `samplesheet.csv` file. The `phenotype` can be anything, here we use control
 and cancer. This file can contain batch information, for which the data will be
@@ -152,6 +152,19 @@ using [pycombat][5]. You can set batch information in a new column in the
 `metadata.csv` file. The name of this column should be set in the
 [config file](./config/config.yaml).
 Dummy files are coming from the same batch, so `None` is passed as parameter.
+#### 10. Set the path to the panel of medians
+The panel of medians provided with FrEIA represents the median 5' trinucleotide proportions,
+inverse Shannon entropy and Gini index computed from a set of 70 healthy control samples 
+and 76 pretreatment cancer samples with a tumor fraction equal or higher than 10%.
+To compute your own panel of medians please use [Create_panels.py](./workflow/scripts/1_FrEIA/Create_panels.py)
+#### 11. Set the name of control and case samples
+FrEIA uses these names to compute the FrEIA score. These should be the same as the
+names in the phenotype column of `metadata.csv`.
+#### 12. Set the trinucleotides for FrEIA score calculation.
+This needs to be a coma-separated list of trinucleotides. The ones used in this example were found
+to be significantly increased (TncCas) or decreased (TncCtr) in 76 cancer samples with a
+tumor fraction higher than 10%, compared to healthy controls.
+
 
 ### Running FrEIA on a HPC cluster using Snakemake and Slurm
 This is the recommended way of running the pipeline, as some steps are
