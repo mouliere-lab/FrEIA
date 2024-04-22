@@ -2,7 +2,7 @@ import pandas as pd
 
 configfile: "../../../config/config.yaml"  # Set config file.
 # Read sample sheet in a dataframe.
-Samplesheet = pd.read_csv(config["Samplesheet"], delim_whitespace=True)
+Samplesheet = pd.read_csv(config["Samplesheet"], sep=" ")
 
 if config["Trimmer"] in ["bbduk", "cutadapt"]:
     ProjDirName = config["ProjName"] + "/trimmed"
