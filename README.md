@@ -141,7 +141,7 @@ On a normal computer this is usually 4 or 8.
 If you use a HPC cluster be aware that with the increase of the core number
 the memory usage can also increase.
 #### 8. Set the path to the metadata file
-The metadata file is a coma-delimited `.csv` file with two obligatory fields:
+The metadata file is a space-delimited `.csv` file with two obligatory fields:
 `sample_name phenotype`. The `sample_name` should be the same as in the
 `samplesheet.csv` file. The `phenotype` can be anything, here we use control
 and cancer. This file can contain batch information, for which the data will be

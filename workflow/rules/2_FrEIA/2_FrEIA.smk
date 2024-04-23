@@ -32,7 +32,7 @@ rule FrEIA_all:
         config["OutPath"] + "/" + ProjDirName +
         "/4_FrEIA/4_Compare/Data/Dat_GT__sample.csv",
         config["OutPath"] + "/" + ProjDirName +
-        "/4_FrEIA/5_FrEIA_score/" + config["ProjName"] + "_corrected_tnc.csv",
+        "/4_FrEIA/5_FrEIA_score/" + config["ProjName"] + "_logFC_p.csv",
         config["OutPath"] + "/" + ProjDirName +
         "/4_FrEIA/5_FrEIA_score/" + config["ProjName"] + "_FrEIA_score.csv"
 # Calculating fragment end sequence diversity and creating outputs,
@@ -121,7 +121,7 @@ rule FrEIA_score:
         "/4_FrEIA/4_Compare/Data/Dat_GT__sample.csv"
     output:
         config["OutPath"] + "/" + ProjDirName +
-        "/4_FrEIA/5_FrEIA_score/" + config["ProjName"] + "_corrected_tnc.csv",
+        "/4_FrEIA/5_FrEIA_score/" + config["ProjName"] + "_logFC_p.csv",
         config["OutPath"] + "/" + ProjDirName +
         "/4_FrEIA/5_FrEIA_score/" + config["ProjName"] + "_FrEIA_score.csv"
     params:
@@ -154,5 +154,6 @@ rule FrEIA_score:
         --tnc_case {params.tncCas} \
         -b {params.batch} \
         --gini \
-        -t {params.threads}
+        -t {params.threads} \
+        2> {log}
         """
